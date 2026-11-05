@@ -1,0 +1,21 @@
+{
+  "metrics": {
+    "sample_pages": 7,
+    "expected_fixed_rows": 37,
+    "accepted_sample_rows": 37,
+    "sample_rows_resolved_within_edition": 32,
+    "exact_rows": 37,
+    "exact_precision": 1.0,
+    "exact_recall": 1.0,
+    "field_correct": {
+      "code": 37,
+      "description": 37,
+      "fee": 37,
+      "page": 37,
+      "prefix": 37
+    },
+    "review_cases": 6,
+    "review_caught": 6
+  },
+  "errors": []
+}

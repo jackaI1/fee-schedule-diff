@@ -29,9 +29,5 @@ jobs:
         with:
           python-version: '3.12'
       - run: uv sync --frozen
-      - uses: actions/cache@v4
-        with:
-          path: data/source
-          key: public-pdfs-${{ hashFiles('data/sources.json') }}
       - run: uv run python scripts/reproduce.py
       - run: git diff --exit-code -- reports

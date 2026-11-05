@@ -12,7 +12,7 @@ from fee_schedule_diff.validate import validate
 def main():
     editions = []
     for source in json.loads(Path("data/sources.json").read_text()):
-        path = download(source, "data/source")
+        path = download(source, "data/snapshots")
         edition = extract_pdf(path, source["url"], source["label"])
         write(f"tmp/{source['label']}.json", edition)
         editions.append(edition)

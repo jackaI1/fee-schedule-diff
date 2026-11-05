@@ -1,6 +1,6 @@
 # How I checked extraction
 
-I transcribed the fee rows from rendered PDF pages into `tests/fixtures/gold.json`. The expected descriptions and fees are separate from the parser output. The adjacent word-coordinate fixtures came from those same public PDF pages using pdfplumber with `x_tolerance=2, y_tolerance=3`. They let tests run without a network connection. The full reproduction command downloads the original PDFs and extracts their text again; it does not use the coordinate fixtures.
+I transcribed the fee rows from rendered PDF pages into `tests/fixtures/gold.json`. The expected descriptions and fees are separate from the parser output. The adjacent word-coordinate fixtures came from those same public PDF pages using pdfplumber with `x_tolerance=2, y_tolerance=3`. They let tests run without a network connection. The full reproduction command verifies the original PDF snapshots and extracts their text again; it does not use the coordinate fixtures. The snapshots are exact copies of the successful gov.bc.ca downloads, retained because GitHub runners could not download them directly.
 
 The sample contains complete fee-table pages from the out-of-office, critical-care and vascular-surgery sections. It includes wrapped descriptions, a continuation after a price, leading-zero codes, letter prefixes, anesthesia-unit columns, percentage-of-body-area descriptions and multi-price rows. Source links are in the manifest, and the physical page is in each fixture filename and gold entry. The December and April editions sometimes repeat the same service wording, so these are not independent random observations.
 
@@ -21,11 +21,11 @@ To inspect the same pages locally, with Poppler installed:
 
 ```sh
 mkdir -p tmp/pdfs
-pdftoppm -f 49 -l 50 -scale-to 1800 -png data/source/2025-04-30.pdf tmp/pdfs/april
-pdftoppm -f 100 -l 100 -scale-to 1800 -png data/source/2025-04-30.pdf tmp/pdfs/critical
-pdftoppm -f 440 -l 440 -scale-to 1800 -png data/source/2025-04-30.pdf tmp/pdfs/surgery
-pdftoppm -f 50 -l 51 -scale-to 1800 -png data/source/2024-12-31.pdf tmp/pdfs/december
-pdftoppm -f 101 -l 101 -scale-to 1800 -png data/source/2024-12-31.pdf tmp/pdfs/december-critical
+pdftoppm -f 49 -l 50 -scale-to 1800 -png data/snapshots/2025-04-30.pdf tmp/pdfs/april
+pdftoppm -f 100 -l 100 -scale-to 1800 -png data/snapshots/2025-04-30.pdf tmp/pdfs/critical
+pdftoppm -f 440 -l 440 -scale-to 1800 -png data/snapshots/2025-04-30.pdf tmp/pdfs/surgery
+pdftoppm -f 50 -l 51 -scale-to 1800 -png data/snapshots/2024-12-31.pdf tmp/pdfs/december
+pdftoppm -f 101 -l 101 -scale-to 1800 -png data/snapshots/2024-12-31.pdf tmp/pdfs/december-critical
 ```
 
 Every fee-table row on these pages is annotated. General explanatory prose and billing notes are not fee rows. The parser retains the literal row description; a short label such as “Day 1” still depends on the section heading in the PDF. Matching that literal label does not establish that the underlying policy or context stayed the same.

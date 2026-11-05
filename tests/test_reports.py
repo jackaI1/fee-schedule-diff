@@ -19,3 +19,12 @@ def test_saved_reports_share_counts_and_evidence():
                 assert 1 <= row["page"] <= result[source]["pages"]
     assert Path("reports/comparison.md").read_text() == markdown(result)
     assert Path("reports/summary.md").read_text() == markdown(result, limit=12)
+
+
+def test_original_pdf_snapshots_match_public_source_fingerprints():
+    import hashlib
+
+    for source in json.loads(Path("data/sources.json").read_text()):
+        path = Path("data/snapshots") / f"{source['label']}.pdf"
+        assert path.read_bytes().startswith(b"%PDF-")
+        assert hashlib.sha256(path.read_bytes()).hexdigest() == source["sha256"]

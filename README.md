@@ -15,7 +15,7 @@ uv sync --frozen --extra dev
 uv run python scripts/reproduce.py
 ```
 
-This downloads the public editions, extracts their fee rows, rebuilds the saved reports and checks the extraction against my hand-checked sample. Open `reports/summary.md` afterwards. PDFs are cached in `data/source/` and kept out of git. No account or private data is needed.
+This verifies saved copies of the original public PDFs, extracts their fee rows, rebuilds the reports and checks the extraction against my hand-checked sample. Open `reports/summary.md` afterwards. The original PDF snapshots are in `data/snapshots/`. The separate `fetch` command downloads fresh copies into the ignored `data/source/` cache. No account or private data is needed.
 
 ## What I compare
 
@@ -57,7 +57,7 @@ I used the Province of British Columbia's [MSC Payment Schedule publication page
 - [December 31, 2024 edition](https://www2.gov.bc.ca/assets/gov/health/practitioner-pro/medical-services-plan/msc_payment_schedule_-_dec_31_2024.pdf)
 - [April 30, 2025 edition](https://www2.gov.bc.ca/assets/gov/health/practitioner-pro/medical-services-plan/msc_payment_schedule_-_april_30_2025.pdf)
 
-Both downloads succeeded; I used no substitute. These are historical editions. The PDFs are provincial publications, subject to the province's [copyright terms](https://www2.gov.bc.ca/gov/content/home/copyright). I retain small public-text test fixtures and derived reports here. There are no patient records, claims or connections to private systems.
+Both original downloads succeeded on my Mac; I used no substitute. The provincial server closed connections from the GitHub runner, so I included byte-for-byte copies of those original PDFs for reproducible checks without a network connection. These are historical editions. The PDFs are provincial publications, subject to the province's [copyright terms](https://www2.gov.bc.ca/gov/content/home/copyright). I retain the original PDFs, small public-text test fixtures and derived reports here. The PDF snapshots are unchanged provincial publications, provided for reference, and the reports are my own derived work, not official publications. There are no patient records, claims or connections to private systems.
 
 `data/sources.json` records each URL and its SHA-256 hash, a fingerprint of the file's exact bytes. A changed download fails the check rather than silently changing the comparison. The report records those fingerprints too.
 
@@ -83,4 +83,4 @@ uv run ruff format --check .
 uv build
 ```
 
-GitHub Actions runs the tests and package build across supported Python versions. A separate check downloads the pinned public PDFs, reruns the complete comparison and rejects any difference from the committed reports. The offline tests cover real page fixtures, additions and removals, price and wording changes, uncertain rows, duplicate conflicts, source links and download integrity.
+GitHub Actions runs the tests and package build across supported Python versions. A separate check verifies the original PDF snapshots, reruns the complete comparison and rejects any difference from the committed reports. The offline tests cover real page fixtures, additions and removals, price and wording changes, uncertain rows, duplicate conflicts, source links and download integrity.

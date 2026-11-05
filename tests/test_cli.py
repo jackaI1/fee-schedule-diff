@@ -83,3 +83,42 @@ def test_empty_page_is_explicit_review():
     items, review = parse_page([], 1, "https://www2.gov.bc.ca/a.pdf")
     assert not items
     assert "no extractable" in review[0]["reason"]
+
+
+def test_transient_disconnect_is_retried(tmp_path, monkeypatch):
+    data = b"%PDF- pinned edition"
+    source = dict(
+        label="edition",
+        url="https://www2.gov.bc.ca/source.pdf",
+        sha256=hashlib.sha256(data).hexdigest(),
+    )
+    calls = []
+
+    def response(request, **kwargs):
+        calls.append(request)
+        if len(calls) == 1:
+            raise ConnectionResetError("temporary disconnect")
+        return BytesIO(data)
+
+    monkeypatch.setattr("urllib.request.urlopen", response)
+    monkeypatch.setattr("time.sleep", lambda _: None)
+    assert download(source, tmp_path).read_bytes() == data
+    assert len(calls) == 2
+    assert "fee-schedule-diff" in calls[0].get_header("User-agent")
+
+
+def test_access_denied_is_not_retried(tmp_path, monkeypatch):
+    from urllib.error import HTTPError
+
+    calls = []
+
+    def denied(*args, **kwargs):
+        calls.append(1)
+        raise HTTPError("https://www2.gov.bc.ca/source.pdf", 403, "Forbidden", {}, None)
+
+    monkeypatch.setattr("urllib.request.urlopen", denied)
+    with pytest.raises(HTTPError):
+        download(
+            dict(label="edition", url="https://www2.gov.bc.ca/source.pdf", sha256="x"), tmp_path
+        )
+    assert len(calls) == 1

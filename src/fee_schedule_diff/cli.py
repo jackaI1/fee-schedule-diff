@@ -2,6 +2,8 @@ import argparse
 import hashlib
 import json
 import sys
+import time
+import urllib.error
 import urllib.request
 from pathlib import Path
 from urllib.parse import urlparse
@@ -30,8 +32,26 @@ def download(source, directory):
     path = Path(directory) / f"{source['label']}.pdf"
     if path.exists() and hashlib.sha256(path.read_bytes()).hexdigest() == source["sha256"]:
         return path
-    with urllib.request.urlopen(url, timeout=60) as response:
-        data = response.read(30_000_001)
+    request = urllib.request.Request(
+        url,
+        headers={
+            "User-Agent": "fee-schedule-diff/0.1 (+https://github.com/jackaI1/fee-schedule-diff)",
+            "Accept": "application/pdf",
+        },
+    )
+    for attempt in range(3):
+        try:
+            with urllib.request.urlopen(request, timeout=60) as response:
+                data = response.read(30_000_001)
+            break
+        except urllib.error.HTTPError as exc:
+            # Do not retry a denial or an unavailable URL.
+            if exc.code not in (502, 503, 504) or attempt == 2:
+                raise
+        except OSError:
+            if attempt == 2:
+                raise
+        time.sleep(attempt + 1)
     if len(data) > 30_000_000 or not data.startswith(b"%PDF-"):
         raise ValueError("Source is not a supported-size PDF")
     if hashlib.sha256(data).hexdigest() != source["sha256"]:

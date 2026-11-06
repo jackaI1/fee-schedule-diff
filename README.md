@@ -1,10 +1,18 @@
+I merged this into my existing [lab-assay-lims project](https://github.com/jackaI1/lab-assay-lims/tree/main/projects/fee-schedule-diff). The current code is in `projects/fee-schedule-diff/` there. I kept the code here so older links still work.
+
+The move keeps the original layout, including `tests/conftest.py`, `tests/test_reports.py`, `tests/test_compare.py`, `tests/test_extract.py`. I replaced the README with the report below and left out Git history, installed dependencies, caches and generated build output from the hub copy.
+
+The 5 test source files moved with the code. No project-specific GitHub Actions workflow was retained; the report records the omitted checks, and the test sources can be run locally from the linked folder.
+
+Other specific omissions: reports/ (generated output).
+
+Omitted workflows: `fee-schedule-diff-ci.yml`: The relocated workflow did not complete successfully within the migration batch. Local test sources remain available.
+
+---
+
 # fee-schedule-diff
 
-I built a tool that compares editions of BC's public medical fee schedule because I wanted to see which entries changed without searching two long PDFs by hand. A fee code is the identifier for a listed medical service. I extract each readable code, description and price, then report added codes, removed codes, changed prices and reworded descriptions. Every reported change has a link to its page in the original PDF.
-
-**[Open the saved comparison](reports/summary.md)** to try it without installing anything. It compares the December 31, 2024 and April 30, 2025 MSC Payment Schedule editions. The [full report](reports/comparison.md) contains every reported change, and the [JSON report](reports/comparison.json) includes the complete review queue in a format another program can read.
-
-If a row has several prices or unclear text, I flag it for review instead of choosing a value. These reports help me find source pages to check; they do not replace the schedule's billing rules.
+I built a tool that compares editions of BC's public medical fee schedule to learn how the underlying idea works. This is a learning project.
 
 ## Run it
 
@@ -61,26 +69,14 @@ Both original downloads succeeded on my Mac; I used no substitute. The provincia
 
 `data/sources.json` records each URL and its SHA-256 hash, a fingerprint of the file's exact bytes. A changed download fails the check rather than silently changing the comparison. The report records those fingerprints too.
 
-## How it is checked
+## Tests and limits
 
-I checked complete fee-table pages by reading rendered source pages and transcribing the expected rows separately. The sample has 37 fixed-price rows across seven pages and six multi-price review cases. All 37 rows match exactly on code, letter prefix, description, price and page; all six review cases are flagged. Exact precision and recall on this sample are both 100%. Precision measures how many accepted rows are correct; recall measures how many expected rows were recovered.
+There are 5 test source files in this copy. That source count does not establish an execution result. This is a source snapshot, and running it on a new machine may need environment-specific setup.
 
-This is a small, selected regression sample used during development, not a blind estimate for the whole schedule. The score measures row extraction before duplicate-code quarantine, which can exclude correctly read rows from comparison. The [accuracy report](reports/accuracy.json) includes that later coverage count. [Sample selection and reproduction](docs/accuracy.md) explains the method and its limits.
 
-All report figures above come from:
 
-```sh
-uv run python scripts/reproduce.py
-uv run python scripts/stats.py
-```
+Generated output omitted from this copy: reports/ (generated output). Regenerate it with the project scripts.
 
-The code in `src/fee_schedule_diff/` separates PDF extraction, comparison, report writing and sample validation. I use pdfplumber for word positions and Python's Decimal type to compare prices without floating-point rounding. Python requirements are in `pyproject.toml`; `uv.lock` pins dependencies.
+The relocated workflow did not complete successfully within the migration batch. Local test sources remain available.
 
-```sh
-uv run pytest -q
-uv run ruff check .
-uv run ruff format --check .
-uv build
-```
-
-GitHub Actions runs the tests and package build across supported Python versions. A separate check verifies the original PDF snapshots, reruns the complete comparison and rejects any difference from the committed reports. The offline tests cover real page fixtures, additions and removals, price and wording changes, uncertain rows, duplicate conflicts, source links and download integrity.
+No project-specific GitHub Actions workflow was retained. The local test sources remain in this folder.
